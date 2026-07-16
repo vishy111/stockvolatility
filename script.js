@@ -1,16 +1,16 @@
 console.log("JS loaded");
 
-d3.tsv("AAPL.csv").then(function(data) {
+d3.csv("AAPL.csv").then(function(data) {
 
   const parseDate = d3.timeParse("%m/%d/%Y");
 
   data.forEach(function(d) {
-    d.date = parseDate(d.Date.trim());
-    d.close = +d["Close(t)"].trim();
+    d.date = parseDate(d.Date?.trim());
+    d.close = +d["Close(t)"]?.trim();
   });
-  console.log(Object.keys(data[0]));
 
-  console.log("FIRST ROW  :", data[0]);
+  console.log(Object.keys(data[0]));
+  console.log("FIRST ROW:", data[0]);
 
   const w = 800;
   const h = 400;
