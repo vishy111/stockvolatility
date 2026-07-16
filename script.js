@@ -71,6 +71,59 @@ function drawScene(scene, data)
     ])
     .range([h - margin.bottom, margin.top]);
 
+  const tooltip = d3.select("#tooltip");
+  const bisectDate = d3.bisector(d => d.date).left;
+
+  const hoverCircle = svg.append("circle")
+    .attr("r", 6)
+    .attr("class", "tooltip-circle")
+    .style("display", "none");
+
+  svg.append("rect")
+    .attr("width", w)
+    .attr("height", h)
+    .attr("fill", "none")
+    .attr("pointer-events", "all")
+    .on("mousemove", function(event) 
+    {
+      const mouseX = d3.pointer(event)[0];
+      const xDate = x.invert(mouseX);
+      const i = bisectDate(sceneData, xDate);
+
+      const d = sceneData[i];
+      if (!d) return;
+
+      hoverCircle
+        .style("display", "")
+        .attr("cx", x(d.date))
+        .attr("cy", yClose(d.close));
+
+      let html = "<strong>" + d.date.toLocaleDateString() + "</strong><br>" +
+                 "Close: " + d.close.toFixed(2);
+
+      if (scene >= 2) 
+      {
+        html += "<br>SD20: " + d.SD20.toFixed(2);
+      }
+
+      if (scene === 3) 
+      {
+        html += "<br>Upper: " + d.upper.toFixed(2) +
+                "<br>Lower: " + d.lower.toFixed(2);
+      }
+
+      tooltip
+        .style("display", "block")
+        .style("left", (event.pageX + 15) + "px")
+        .style("top", (event.pageY - 20) + "px")
+        .html(html);
+    })
+    .on("mouseout", function() 
+    {
+      hoverCircle.style("display", "none");
+      tooltip.style("display", "none");
+    });
+
   if (scene === 1) 
   {
     const lineClose = d3.line()
@@ -185,7 +238,6 @@ d3.csv("AAPL.csv").then(function(data) {
     d.upper = d.MA20 + (2 * d.SD20);
     d.lower = d.MA20 - (2 * d.SD20);
   });
-
 
   
   window.globalData = data;
