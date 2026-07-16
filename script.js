@@ -61,6 +61,10 @@ function drawScene(scene, data)
     ])
     .range([h - margin.bottom, margin.top]);
 
+  const yVol = d3.scaleLinear()
+    .domain(d3.extent(sceneData, d => d.SD20))
+    .range([h - margin.bottom, margin.top]);
+
   if (scene === 4)
   {
     const zoom = d3.zoom()
@@ -71,18 +75,26 @@ function drawScene(scene, data)
       {
         const newX = event.transform.rescaleX(x);
 
+        const visibleData = sceneData.filter(d => {
+          const px = newX(d.date);
+          return px >= margin.left && px <= w - margin.right;
+        });
+
+        const newY = d3.scaleLinear()
+          .domain([
+            d3.min(visibleData, d => d.lower),
+            d3.max(visibleData, d => d.upper)
+          ])
+          .range([h - margin.bottom, margin.top]);
+
         svg.selectAll("*").remove();
 
         const xAxis = d3.axisBottom(newX);
-        const yAxis = d3.axisLeft(yClose);
+        const yAxis = d3.axisLeft(newY);
 
         const lineCloseZoom = d3.line()
           .x(d => newX(d.date))
-          .y(d => yClose(d.close));
-
-        const yVol = d3.scaleLinear()
-          .domain(d3.extent(sceneData, d => d.SD20))
-          .range([h - margin.bottom, margin.top]);
+          .y(d => newY(d.close));
 
         const lineVolZoom = d3.line()
           .x(d => newX(d.date))
@@ -90,15 +102,15 @@ function drawScene(scene, data)
 
         const lineMA20Zoom = d3.line()
           .x(d => newX(d.date))
-          .y(d => yClose(d.MA20));
+          .y(d => newY(d.MA20));
 
         const lineUpperZoom = d3.line()
           .x(d => newX(d.date))
-          .y(d => yClose(d.upper));
+          .y(d => newY(d.upper));
 
         const lineLowerZoom = d3.line()
           .x(d => newX(d.date))
-          .y(d => yClose(d.lower));
+          .y(d => newY(d.lower));
 
         if (document.getElementById("show-close").checked)
         {
@@ -136,8 +148,8 @@ function drawScene(scene, data)
             .attr("pointer-events", "none")
             .attr("d", d3.area()
               .x(d => newX(d.date))
-              .y0(d => yClose(d.lower))
-              .y1(d => yClose(d.upper))
+              .y0(d => newY(d.lower))
+              .y1(d => newY(d.upper))
             );
 
           svg.append("path")
@@ -202,10 +214,6 @@ function drawScene(scene, data)
 
       if (scene >= 2) 
       {
-        const yVol = d3.scaleLinear()
-          .domain(d3.extent(sceneData, d => d.SD20))
-          .range([h - margin.bottom, margin.top]);
-
         const distClose = Math.abs(yClose(d.close) - mouseY);
         const distVol = Math.abs(yVol(d.SD20) - mouseY);
 
@@ -281,10 +289,6 @@ function drawScene(scene, data)
   };
 
   const drawVol = () => {
-    const yVol = d3.scaleLinear()
-      .domain(d3.extent(sceneData, d => d.SD20))
-      .range([h - margin.bottom, margin.top]);
-
     const lineVol = d3.line()
       .x(d => x(d.date))
       .y(d => yVol(d.SD20));
