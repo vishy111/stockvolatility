@@ -24,6 +24,8 @@ function setAnnotation(scene )
   } else {
     box.textContent = "";
   }
+
+  box.textContent += " (Hover over the chart to see exact values.)";
 }
 
 function updateButtons( ) 
@@ -79,6 +81,12 @@ function drawScene(scene, data)
     .attr("class", "tooltip-circle")
     .style("display", "none");
 
+  const hoverCircleVol = svg.append("circle")
+    .attr("r", 6)
+    .attr("class", "tooltip-circle")
+    .style("fill", "orange")
+    .style("display", "none");
+
   svg.append("rect")
     .attr("width", w)
     .attr("height", h)
@@ -87,16 +95,54 @@ function drawScene(scene, data)
     .on("mousemove", function(event) 
     {
       const mouseX = d3.pointer(event)[0];
+      const mouseY = d3.pointer(event)[1];
       const xDate = x.invert(mouseX);
       const i = bisectDate(sceneData, xDate);
 
       const d = sceneData[i];
       if (!d) return;
 
-      hoverCircle
-        .style("display", "")
-        .attr("cx", x(d.date))
-        .attr("cy", yClose(d.close));
+      let hoveredColor = "steelblue";
+      let hoveredY = yClose(d.close);
+
+      if (scene >= 2) 
+      {
+        const yVol = d3.scaleLinear()
+          .domain(d3.extent(sceneData, d => d.SD20))
+          .range([h - margin.bottom, margin.top]);
+
+        const distClose = Math.abs(yClose(d.close) - mouseY);
+        const distVol = Math.abs(yVol(d.SD20) - mouseY);
+
+        if (distVol < distClose) 
+        {
+          hoveredColor = "orange";
+          hoveredY = yVol(d.SD20);
+
+          hoverCircleVol
+            .style("display", "")
+            .attr("cx", x(d.date))
+            .attr("cy", hoveredY);
+
+          hoverCircle.style("display", "none");
+        }
+        else 
+        {
+          hoverCircle
+            .style("display", "")
+            .attr("cx", x(d.date))
+            .attr("cy", hoveredY);
+
+          hoverCircleVol.style("display", "none");
+        }
+      }
+      else 
+      {
+        hoverCircle
+          .style("display", "")
+          .attr("cx", x(d.date))
+          .attr("cy", hoveredY);
+      }
 
       let html = "<strong>" + d.date.toLocaleDateString() + "</strong><br>" +
                  "Close: " + d.close.toFixed(2);
@@ -114,6 +160,7 @@ function drawScene(scene, data)
 
       tooltip
         .style("display", "block")
+        .style("border-left", "6px solid " + hoveredColor)
         .style("left", (event.pageX + 15) + "px")
         .style("top", (event.pageY - 20) + "px")
         .html(html);
@@ -121,6 +168,7 @@ function drawScene(scene, data)
     .on("mouseout", function() 
     {
       hoverCircle.style("display", "none");
+      hoverCircleVol.style("display", "none");
       tooltip.style("display", "none");
     });
 
@@ -184,6 +232,7 @@ function drawScene(scene, data)
       .datum(sceneData)
       .attr("fill", "rgba(255,0,0,0.20)")
       .attr("stroke", "none")
+      .attr("pointer-events", "none")
       .attr("d", d3.area()
         .x(d => x(d.date))
         .y0(d => yClose(d.lower))
@@ -239,9 +288,7 @@ d3.csv("AAPL.csv").then(function(data) {
     d.lower = d.MA20 - (2 * d.SD20);
   });
 
-  
   window.globalData = data;
-
   
   drawScene(scene, data);
 });
