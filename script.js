@@ -64,12 +64,12 @@ function drawScene(scene, data) {
       .attr("d", lineClose);
 
     const yVol = d3.scaleLinear()
-      .domain(d3.extent(sceneData, d => d.SD20))
+      .domain(d3.extent(sceneData, d => d.sd20))
       .range([h - margin.bottom, margin.top]);
 
     const lineVol = d3.line()
       .x(d => x(d.date))
-      .y(d => yVol(d.SD20));
+      .y(d => yVol(d.sd20));
 
     svg.append("path")
       .datum(sceneData)
@@ -149,16 +149,35 @@ function drawScene(scene, data) {
 
 d3.csv("AAPL.csv").then(function(data) {
 
-  const parseDate = d3.timeParse("%Y-%m-%d");
+  const parseDate = d3.timeParse("%m/%d/%Y");
 
   data.forEach(function(d) {
     d.date = parseDate(d.Date);
     d.close = +d["Close(t)"];
-    d.SD20 = +d.SD20;
-    d.MA20 = +d.MA20;
-    d.upper = d.MA20 + (2 * d.SD20);
-    d.lower = d.MA20 - (2 * d.SD20);
   });
+
+  for (let i = 0; i < data.length; i++) {
+
+    if (i < 20) {
+      data[i].ma20 = data[i].close;
+      data[i].sd20 = 0;
+    } else {
+
+      let window = data.slice(i - 19, i + 1);
+      let closes = window.map(d => d.close);
+
+      let mean = closes.reduce((a, b) => a + b, 0) / 20;
+
+      let variance = closes.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / 20;
+      let sd = Math.sqrt(variance);
+
+      data[i].ma20 = mean;
+      data[i].sd20 = sd;
+    }
+
+    data[i].upper = data[i].ma20 + (2 * data[i].sd20);
+    data[i].lower = data[i].ma20 - (2 * data[i].sd20);
+  }
 
   window.globalData = data;
 
