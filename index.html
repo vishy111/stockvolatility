@@ -42,6 +42,16 @@
     Scene 3: Exploring Bollinger Bands
   </div>
 
+  <div id="summary4" style="
+      text-align:center;
+      font-size:20px;
+      font-weight:bold;
+      margin:15px auto;
+      display:none;
+  ">
+    Scene 4: Free Exploration Mode
+  </div>
+
   <div id="annotation1" style="
       font-size:18px;
       margin:20px auto;
@@ -113,6 +123,25 @@
     </ul>
   </div>
 
+  <div id="annotation4" style="
+      font-size:18px;
+      margin:20px auto;
+      line-height:1.6;
+      max-width:900px;
+      background:#f0f4ff;
+      padding:20px;
+      border-left:6px solid #1e88e5;
+      border-radius:6px;
+      display:none;
+  ">
+    <ul style="margin:0; padding-left:20px;">
+      <li>Use the toggles below to explore the chart freely.</li>
+      <li>You can turn volatility, Bollinger Bands, and volume on or off.</li>
+      <li>Try comparing two dates or drawing a quick trendline.</li>
+      <li>This mode lets you experiment and discover patterns on your own.</li>
+    </ul>
+  </div>
+
   <div id="bb-info" style="
         display:none;
         background:#f9f3ff;
@@ -171,6 +200,9 @@
       <label><input type="checkbox" id="show-bands" checked> Bollinger Bands</label>
       <label><input type="checkbox" id="show-volatility" checked> Volatility (SD20)</label>
       <label><input type="checkbox" id="show-volume"> Volume</label>
+      <label><input type="checkbox" id="compare-dates"> Compare Two Dates</label>
+      <label><input type="checkbox" id="draw-trendline"> Draw Trendline</label>
+      <button id="reset-view" class="nav-btn" style="padding:8px 16px; font-size:16px;">Reset View</button>
     </div>
   </div>
 
