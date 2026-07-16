@@ -159,6 +159,12 @@ d3.csv("AAPL.csv").then(function(data) {
     d.lower = +d.Lower_Band;
   });
 
+  data.forEach(d => {
+    if (d.lower > d.close) {
+      console.log("BAD DATA:", d.Date, d.lower, d.close);
+    }
+  });
+
   window.globalData = data;
 
   drawScene(scene, data);
