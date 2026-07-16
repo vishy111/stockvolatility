@@ -10,6 +10,7 @@ function updateButtons( )
 
   if (scene === 1) backBtn.classList.add("disabled");
   if (scene === 3) nextBtn.classList.add("disabled");
+  if (scene === 4) nextBtn.classList.add("disabled");
 }
 
 function drawScene(scene, data) 
@@ -123,7 +124,7 @@ function drawScene(scene, data)
         html += "<br>SD20: " + d.SD20.toFixed(2);
       }
 
-      if (scene === 3) 
+      if (scene === 3 || scene === 4) 
       {
         html += "<br>Upper: " + d.upper.toFixed(2) +
                 "<br>Lower: " + d.lower.toFixed(2);
@@ -143,8 +144,7 @@ function drawScene(scene, data)
       tooltip.style("display", "none");
     });
 
-  if (scene === 1) 
-  {
+  const drawClose = () => {
     const lineClose = d3.line()
       .x(d => x(d.date))
       .y(d => yClose(d.close));
@@ -155,21 +155,9 @@ function drawScene(scene, data)
       .attr("stroke", "steelblue")
       .attr("stroke-width", 3)
       .attr("d", lineClose);
-  }
+  };
 
-  if (scene === 2) {
-    const lineClose = d3.line()
-      .x(d => x(d.date))
-      .y(d => yClose(d.close));
-
-    svg.append("path")
-      .datum(sceneData)
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 3)
-      .attr("d", lineClose);
-
-    
+  const drawVol = () => {
     const yVol = d3.scaleLinear()
       .domain(d3.extent(sceneData, d => d.SD20))
       .range([h - margin.bottom, margin.top]);
@@ -184,21 +172,9 @@ function drawScene(scene, data)
       .attr("stroke", "orange")
       .attr("stroke-width", 3)
       .attr("d", lineVol);
-  }
+  };
 
-  if (scene === 3) 
-  {
-    const lineClose = d3.line()
-      .x(d => x(d.date))
-      .y(d => yClose(d.close));
-
-    svg.append("path")
-      .datum(sceneData)
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 3)
-      .attr("d", lineClose);
-
+  const drawBands = () => {
     const lineMA20 = d3.line()
       .x(d => x(d.date))
       .y(d => yClose(d.MA20));
@@ -209,7 +185,6 @@ function drawScene(scene, data)
       .attr("stroke", "lightgreen")
       .attr("stroke-width", 3)
       .attr("d", lineMA20);
-
 
     svg.append("path")
       .datum(sceneData)
@@ -244,6 +219,46 @@ function drawScene(scene, data)
       .attr("stroke-width", 4)
       .attr("stroke-dasharray", "6 6")
       .attr("d", lineLower);
+  };
+
+  const drawTrendline = () => {
+    const first = sceneData[0];
+    const last = sceneData[sceneData.length - 1];
+    svg.append("line")
+      .attr("x1", x(first.date))
+      .attr("y1", yClose(first.close))
+      .attr("x2", x(last.date))
+      .attr("y2", yClose(last.close))
+      .attr("stroke", "black")
+      .attr("stroke-width", 3);
+  };
+
+  const drawCompare = () => {
+    const first = sceneData[0];
+    const last = sceneData[sceneData.length - 1];
+    svg.append("circle")
+      .attr("cx", x(first.date))
+      .attr("cy", yClose(first.close))
+      .attr("r", 8)
+      .attr("fill", "green");
+    svg.append("circle")
+      .attr("cx", x(last.date))
+      .attr("cy", yClose(last.close))
+      .attr("r", 8)
+      .attr("fill", "red");
+  };
+
+  if (scene === 1) drawClose();
+  if (scene === 2) { drawClose(); drawVol(); }
+  if (scene === 3) { drawClose(); drawBands(); }
+
+  if (scene === 4) 
+  {
+    drawClose();
+    if (document.getElementById("show-bands").checked) drawBands();
+    if (document.getElementById("show-volatility").checked) drawVol();
+    if (document.getElementById("draw-trendline").checked) drawTrendline();
+    if (document.getElementById("compare-dates").checked) drawCompare();
   }
 
   svg.append("g")
@@ -263,15 +278,27 @@ function drawScene(scene, data)
     document.getElementById("bb-button").style.display = "none";
     document.getElementById("bb-info").style.display = "none";
   }
+
+  if (scene === 4)
+  {
+    document.getElementById("explore-controls").style.display = "block";
+  }
+  else
+  {
+    document.getElementById("explore-controls").style.display = "none";
+  }
+
   updateButtons();
 
 document.getElementById("summary1").style.display = scene === 1 ? "block" : "none";
 document.getElementById("summary2").style.display = scene === 2 ? "block" : "none";
 document.getElementById("summary3").style.display = scene === 3 ? "block" : "none";
+document.getElementById("summary4").style.display = scene === 4 ? "block" : "none";
 
 document.getElementById("annotation1").style.display = scene === 1 ? "block" : "none";
 document.getElementById("annotation2").style.display = scene === 2 ? "block" : "none";
 document.getElementById("annotation3").style.display = scene === 3 ? "block" : "none";
+document.getElementById("annotation4").style.display = scene === 4 ? "block" : "none";
 }
 
 d3.csv("AAPL.csv").then(function(data) {
@@ -293,7 +320,7 @@ d3.csv("AAPL.csv").then(function(data) {
 });
 
 document.getElementById("next").onclick = () => {
-  if (scene < 3) 
+  if (scene < 4) 
   {
     scene++;
     drawScene(scene, window.globalData);
@@ -311,4 +338,8 @@ document.getElementById("back").onclick = () => {
 document.getElementById("bb-button").onclick = () => {
   const box = document.getElementById("bb-info");
   box.style.display = box.style.display === "none" ? "block" : "none";
+};
+
+document.getElementById("reset-view").onclick = () => {
+  drawScene(4, window.globalData);
 };
