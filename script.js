@@ -92,6 +92,16 @@ function drawScene(scene, data) {
       .attr("stroke-width", 2)
       .attr("d", lineClose);
 
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "rgba(255,0,0,0.15)")
+      .attr("stroke", "none")
+      .attr("d", d3.area()
+        .x(d => x(d.date))
+        .y0(d => yClose(d.lower))
+        .y1(d => yClose(d.upper))
+      );
+
     const lineUpper = d3.line()
       .x(d => x(d.date))
       .y(d => yClose(d.upper));
@@ -103,15 +113,16 @@ function drawScene(scene, data) {
     svg.append("path")
       .datum(data)
       .attr("fill", "none")
-      .attr("stroke", "red")
-      .attr("stroke-width", 1.5)
+      .attr("stroke", "darkred")
+      .attr("stroke-width", 3)
       .attr("d", lineUpper);
 
     svg.append("path")
       .datum(data)
       .attr("fill", "none")
-      .attr("stroke", "red")
-      .attr("stroke-width", 1.5)
+      .attr("stroke", "maroon")
+      .attr("stroke-width", 3)
+      .attr("stroke-dasharray", "4 4")
       .attr("d", lineLower);
 
     svg.append("text")
