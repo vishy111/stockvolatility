@@ -265,6 +265,10 @@ function drawScene(scene, data)
   }
   updateButtons();
 
+document.getElementById("summary1").style.display = scene === 1 ? "block" : "none";
+document.getElementById("summary2").style.display = scene === 2 ? "block" : "none";
+document.getElementById("summary3").style.display = scene === 3 ? "block" : "none";
+
 document.getElementById("annotation1").style.display = scene === 1 ? "block" : "none";
 document.getElementById("annotation2").style.display = scene === 2 ? "block" : "none";
 document.getElementById("annotation3").style.display = scene === 3 ? "block" : "none";
