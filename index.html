@@ -10,89 +10,142 @@
 </head>
 <body>
 
-  <h1>Understanding Market Volatility (AAPL)</h1>
+  <h1 style="text-align:center;">Understanding Market Volatility (AAPL)</h1>
 
-  <div id="annotation" style="
+  <div id="annotation1" style="
       font-size:18px;
-      margin:20px 0;
-      line-height:1.5;
+      margin:20px auto;
+      line-height:1.6;
       max-width:900px;
       background:#f0f4ff;
-      padding:15px 20px;
+      padding:20px;
       border-left:6px solid #1e88e5;
       border-radius:6px;
-  "></div>
+      display:block;
+  ">
+    <ul style="margin:0; padding-left:20px;">
+      <li>The blue line shows AAPL’s closing price over time.</li>
+      <li>In early 2020, the price climbs steadily before dropping sharply during the March 2020 market selloff.</li>
+      <li>This rise‑and‑fall pattern highlights how quickly market conditions can change.</li>
+      <li>(Hover over the chart to see exact values.)</li>
+    </ul>
+  </div>
 
+  <div id="annotation2" style="
+      font-size:18px;
+      margin:20px auto;
+      line-height:1.6;
+      max-width:900px;
+      background:#f0f4ff;
+      padding:20px;
+      border-left:6px solid #1e88e5;
+      border-radius:6px;
+      display:none;
+  ">
+    <ul style="margin:0; padding-left:20px;">
+      <li>The orange line (SD20) measures volatility.</li>
+      <li>Volatility remains low during calm periods, but spikes dramatically in mid‑March 2020 as the market reacts to COVID‑19.</li>
+      <li>These SD20 surges align with the steep price drops seen in the blue line.</li>
+      <li>(Hover over the chart to see exact values.)</li>
+    </ul>
+  </div>
+
+  <div id="annotation3" style="
+      font-size:18px;
+      margin:20px auto;
+      line-height:1.6;
+      max-width:900px;
+      background:#f0f4ff;
+      padding:20px;
+      border-left:6px solid #1e88e5;
+      border-radius:6px;
+      display:none;
+  ">
+    <ul style="margin:0; padding-left:20px;">
+      <li>The purple middle band shows the 20‑day moving average (MA20), the baseline trend.</li>
+      <li>If the middle band moves upward, it suggests an uptrend; downward movement suggests a downtrend.</li>
+      <li>The dark red upper band marks two standard deviations above MA20. Price touching or moving outside this band may indicate overbought conditions.</li>
+      <li>The dashed maroon lower band marks two standard deviations below MA20. Price touching or falling outside this band may indicate oversold conditions.</li>
+      <li>The width of the bands reflects volatility: narrow bands often precede a breakout (“the squeeze”), while wide bands indicate high volatility.</li>
+      <li>Together, these three bands form the Bollinger Band envelope, used to assess volatility, trend direction, and potential entry or exit points.</li>
+      <li>(Hover over the chart to see exact values.)</li>
+    </ul>
+  </div>
+
+  <!-- Legend -->
   <div id="legend" style="
-    margin:10px 0;
+    margin:10px auto;
     font-size:16px;
     line-height:1.6;
-">
-  <div><span style="display:inline-block;width:20px;height:4px;background:steelblue;margin-right:8px;"></span>Close Price</div>
-  <div><span style="display:inline-block;width:20px;height:4px;background:orange;margin-right:8px;"></span>Volatility (SD20)</div>
-  <div><span style="display:inline-block;width:20px;height:4px;background:purple;margin-right:8px;"></span>Middle Band (MA20)</div>
-  <div><span style="display:inline-block;width:20px;height:4px;background:darkred;margin-right:8px;"></span>Upper Band</div>
-  <div><span style="display:inline-block;width:20px;height:0;border-bottom:4px dashed maroon;margin-right:8px;"></span>Lower Band</div>
-</div>
+    max-width:900px;
+  ">
+    <div><span style="display:inline-block;width:20px;height:4px;background:steelblue;margin-right:8px;"></span>Close Price</div>
+    <div><span style="display:inline-block;width:20px;height:4px;background:orange;margin-right:8px;"></span>Volatility (SD20)</div>
+    <div><span style="display:inline-block;width:20px;height:4px;background:purple;margin-right:8px;"></span>Middle Band (MA20)</div>
+    <div><span style="display:inline-block;width:20px;height:4px;background:darkred;margin-right:8px;"></span>Upper Band</div>
+    <div><span style="display:inline-block;width:20px;height:0;border-bottom:4px dashed maroon;margin-right:8px;"></span>Lower Band</div>
+  </div>
 
   <div id="tooltip" style="
-  position: absolute;
-  background: white;
-  border: 1px solid #ccc;
-  padding: 8px 12px;
-  border-radius: 6px;
-  pointer-events: none;
-  font-size: 14px;
-  display: none;
-"></div>
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    border-radius: 6px;
+    pointer-events: none;
+    font-size: 14px;
+    display: none;
+  "></div>
 
   <div id="chart"></div>
 
-  <div id="controls">
-  <button id="back" class="nav-btn">Back</button>
-  <button id="next" class="nav-btn">Next</button>
+  <div id="controls" style="text-align:center;">
+    <button id="back" class="nav-btn">Back</button>
+    <button id="next" class="nav-btn">Next</button>
 
-  <div id="explore-controls" style="display:none;">
-    <label><input type="checkbox" id="show-bands" checked> Bollinger Bands</label>
-    <label><input type="checkbox" id="show-volatility" checked> Volatility (SD20)</label>
-    <label><input type="checkbox" id="show-volume"> Volume</label>
+    <div id="explore-controls" style="display:none;">
+      <label><input type="checkbox" id="show-bands" checked> Bollinger Bands</label>
+      <label><input type="checkbox" id="show-volatility" checked> Volatility (SD20)</label>
+      <label><input type="checkbox" id="show-volume"> Volume</label>
+    </div>
   </div>
-</div>
 
-  <button id="bb-button" style="
-        margin-top:10px;
-        padding:10px 18px;
-        background:purple;
-        color:white;
-        border:none;
-        border-radius:6px;
-        font-size:16px;
-        cursor:pointer;
-        display:none;
-  ">What’s a Bollinger Band?</button>
+  <div style="text-align:center;">
+    <button id="bb-button" style="
+          margin-top:10px;
+          padding:10px 18px;
+          background:purple;
+          color:white;
+          border:none;
+          border-radius:6px;
+          font-size:16px;
+          cursor:pointer;
+          display:none;
+    ">What’s a Bollinger Band?</button>
+  </div>
 
   <div id="bb-info" style="
         display:none;
         background:#f9f3ff;
         border-left:6px solid purple;
         padding:15px 20px;
-        margin-top:15px;
+        margin:15px auto;
         max-width:900px;
         border-radius:6px;
         font-size:16px;
         line-height:1.5;
   ">
     <strong>What’s a Bollinger Band?</strong><br>
-    Bollinger Bands consist of three lines:<br>
-    • Middle Band (MA20): the 20‑day moving average, showing the trend.<br>
-    • Upper Band: MA20 + 2×SD20, marking HIGH price extremes.<br>
-    • Lower Band: MA20 − 2×SD20, marking LOW price extremes.<br><br>
-    Traders use them to:<br>
-    • Spot trends (middle band slope).<br>
-    • Gauge volatility (band width).<br>
-    • Identify overbought/oversold conditions (price touching bands).<br>
-    • Anticipate breakouts (‘the squeeze’ when bands narrow).<br>
-    • Target reversals (‘Bollinger Bounce’ back toward the middle band).<br>
+    <ul style="margin:0; padding-left:20px;">
+      <li>Middle Band (MA20): the 20‑day moving average, showing the trend.</li>
+      <li>Upper Band: MA20 + 2×SD20, marking high price extremes.</li>
+      <li>Lower Band: MA20 − 2×SD20, marking low price extremes.</li>
+      <li>Spot trends (middle band slope).</li>
+      <li>Gauge volatility (band width).</li>
+      <li>Identify overbought/oversold conditions (price touching bands).</li>
+      <li>Anticipate breakouts (“the squeeze” when bands narrow).</li>
+      <li>Target reversals (“Bollinger Bounce” back toward the middle band).</li>
+    </ul>
   </div>
 
   <script src="script.js"></script>
