@@ -8,6 +8,7 @@ d3.tsv("AAPL.csv").then(function(data) {
     d.date = parseDate(d.Date.trim());
     d.close = +d["Close(t)"].trim();
   });
+  console.log(Object.keys(data[0]));
 
   console.log("FIRST ROW  :", data[0]);
 
