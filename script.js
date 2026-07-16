@@ -73,7 +73,52 @@ function drawScene(scene, data) {
       .attr("x", 20)
       .attr("y", 30)
       .style("font-size", "14px")
-      .text("Periods of high volatility correspond to sharp price movements.");
+      .text("Periods of high volatility corresponds to sharp price movements.");
+  }
+
+  
+  if (scene === 3) {
+
+    
+    const lineClose = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.close));
+
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 2)
+      .attr("d", lineClose);
+
+    
+    const lineUpper = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.upper));
+
+    const lineLower = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.lower));
+
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "red")
+      .attr("stroke-width", 1.5)
+      .attr("d", lineUpper);
+
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "red")
+      .attr("stroke-width", 1.5)
+      .attr("d", lineLower);
+
+    svg.append("text")
+      .attr("x", 20)
+      .attr("y", 30)
+      .style("font-size", "14px")
+      .text("Bands widen during periods of volatility and squeeze during calm periods.");
   }
 
   svg.append("g")
@@ -93,6 +138,8 @@ d3.csv("AAPL.csv").then(function(data) {
     d.date = parseDate(d.Date);
     d.close = +d["Close(t)"];
     d.SD20 = +d.SD20;
+    d.upper = +d.Upper_Band;
+    d.lower = +d.Lower_Band;
   });
 
   window.globalData = data;
@@ -101,6 +148,7 @@ d3.csv("AAPL.csv").then(function(data) {
 });
 
 document.getElementById("next").onclick = () => {
+  
   scene = Math.min(scene + 1, 4);
   drawScene(scene, window.globalData);
 };
