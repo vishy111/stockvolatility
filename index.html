@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta charset="UTF-8">
+  <title>AAPL Volatility</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+  <h1>Understanding Market Volatility (AAPL)</h1>
+
+  <div id="scene-description"></div>
+  <div id="chart"></div>
+
+
+  <div id="controls">
+    <button id="back-btn">Back</button>
+    <button id="next-btn">Next</button>
+
+    <div id="explore-controls" style="display:none;">
+      <label><input type="checkbox" id="show-bands" checked> Bollinger Bands</label>
+      <label><input type="checkbox" id="show-volatility" checked> Volatility (SD20)</label>
+      <label><input type="checkbox" id="show-volume"> Volume</label>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
