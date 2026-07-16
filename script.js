@@ -11,7 +11,7 @@ function drawScene(scene, data) {
   let sceneData = data;
 
   if (scene === 3) {
-    sceneData = data.filter(d => d.date >= new Date("2020-02-01") && d.date <= new Date("2020-05-01"));
+    sceneData = data.filter(d => d.date >= new Date("2020-03-15") && d.date <= new Date("2020-03-31"));
   }
 
   const svg = d3.select("#chart")
@@ -151,23 +151,13 @@ d3.csv("AAPL.csv").then(function(data) {
 
   const parseDate = d3.timeParse("%Y-%m-%d");
 
-  data.forEach(function(d, i) {
+  data.forEach(function(d) {
     d.date = parseDate(d.Date);
     d.close = +d["Close(t)"];
     d.SD20 = +d.SD20;
+    d.upper = +d.Upper_Band;
+    d.lower = +d.Lower_Band;
   });
-
-  for (let i = 0; i < data.length; i++) {
-    if (i < 20) {
-      data[i].ma20 = data[i].close;
-    } else {
-      let sum = 0;
-      for (let j = i - 19; j <= i; j++) sum += data[j].close;
-      data[i].ma20 = sum / 20;
-    }
-    data[i].upper = data[i].ma20 + (2 * data[i].SD20);
-    data[i].lower = data[i].ma20 - (2 * data[i].SD20);
-  }
 
   window.globalData = data;
 
