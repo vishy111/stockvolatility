@@ -1,41 +1,5 @@
 let scene = 1;
 
-function setAnnotation(scene ) 
-{
-  const box = document.getElementById("annotation");
-  if (!box) return;
-
-  if (scene === 1) 
-  {
-    box.textContent =
-      "The blue line shows AAPL’s closing price over time. " +
-      "In early 2020, the price climbs steadily before dropping sharply during the March 2020 market selloff. " +
-      "This rise-and-fall pattern highlights how quickly market conditions can change.";
-  } 
-  else if (scene === 2) 
-  {
-    box.textContent =
-      "The orange line (SD20) measures volatility. " +
-      "Volatility remains low during calm periods, but spikes dramatically in mid‑March 2020 as the market reacts to COVID‑19. " +
-      "These SD20 surges align with the steep price drops seen in the blue line.";
-  } 
-  else if (scene === 3) 
-  {
-    box.textContent =
-      "The purple middle band shows the 20‑day moving average (MA20), the baseline trend. " +
-      "If the middle band moves upward, it suggests an uptrend; downward movement suggests a downtrend. " +
-      "The dark red upper band marks two standard deviations above MA20. When price touches or moves outside this band, the asset may be overbought, signaling caution or a potential selling point. " +
-      "The dashed maroon lower band marks two standard deviations below MA20. When price touches or falls outside this band, the asset may be oversold, suggesting a possible buying opportunity. " +
-      "The width of the bands reflects volatility: narrow bands indicate calm periods and often precede a breakout ('the squeeze'), while wide bands indicate high volatility. " +
-      "Together, these three bands form the Bollinger Band envelope, used by traders to assess volatility, trend direction, and potential entry or exit points.";
-  }
-  else 
-  {
-    box.textContent = "";
-  }
-
-  box.textContent += " (Hover over the chart to see exact values.)";
-}
 function updateButtons( ) 
 {
   const backBtn = document.getElementById("back");
@@ -73,7 +37,6 @@ function drawScene(scene, data)
     .domain(d3.extent(sceneData, d => d.date))
     .range([margin.left, w - margin.right]);
 
-  
   const yClose = d3.scaleLinear()
     .domain([
       d3.min(sceneData, d => d.lower),
@@ -300,8 +263,11 @@ function drawScene(scene, data)
     document.getElementById("bb-button").style.display = "none";
     document.getElementById("bb-info").style.display = "none";
   }
-  setAnnotation(scene);
   updateButtons();
+
+document.getElementById("annotation1").style.display = scene === 1 ? "block" : "none";
+document.getElementById("annotation2").style.display = scene === 2 ? "block" : "none";
+document.getElementById("annotation3").style.display = scene === 3 ? "block" : "none";
 }
 
 d3.csv("AAPL.csv").then(function(data) {
