@@ -8,26 +8,31 @@ function setAnnotation(scene )
   if (scene === 1) 
   {
     box.textContent =
-      "Scene 1: The blue line shows AAPL’s closing price over time. " +
-      "Even though it fluctuates day to day, you can still see broader upward or downward trends.";
-  } else if (scene === 2) {
-    box.textContent =
-      "Scene 2: The orange line (SD20) measures volatility. " +
-      "When SD20 rises, price movements become larger and more unstable. " +
-      "When SD20 falls, the market is calmer and price changes are smaller.";
-  } else if (scene === 3) 
+      "The blue line shows AAPL’s closing price over time. " +
+      "In early 2020, the price climbs steadily before dropping sharply during the March 2020 market selloff. " +
+      "This rise-and-fall pattern highlights how quickly market conditions can change.";
+  } 
+  else if (scene === 2) 
   {
     box.textContent =
-      "Scene 3: The red bands around the blue price line are Bollinger Bands based on MA20 and SD20. " +
-      "The lower band stays close to the price when volatility (SD20) is low, so the blue line can sometimes dip below it during sharp selloffs. " +
-      "The upper band can sit much higher than the price when volatility increases, causing the bands to widen and highlight periods of market stress.";
-  } else {
+      "The orange line (SD20) measures volatility. " +
+      "Volatility remains low during calm periods, but spikes dramatically in mid‑March 2020 as the market reacts to COVID‑19. " +
+      "These SD20 surges align with the steep price drops seen in the blue line.";
+  } 
+  else if (scene === 3) 
+  {
+    box.textContent =
+      "The red Bollinger Bands widen sharply during the March 2020 crash. " +
+      "The upper band rises while the lower band falls, forming a large volatility envelope. " +
+      "This widening reflects extreme uncertainty, while later narrowing indicates stabilization.";
+  } 
+  else 
+  {
     box.textContent = "";
   }
 
   box.textContent += " (Hover over the chart to see exact values.)";
 }
-
 function updateButtons( ) 
 {
   const backBtn = document.getElementById("back");
