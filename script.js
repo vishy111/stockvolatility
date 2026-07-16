@@ -1,6 +1,6 @@
 console.log("JS loaded");
 
-d3.csv("AAPL.csv").then(function(data) {
+d3.tsv("AAPL.csv").then(function(data) {
 
   const parseDate = d3.timeParse("%m/%d/%Y");
 
