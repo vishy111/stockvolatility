@@ -61,6 +61,113 @@ function drawScene(scene, data)
     ])
     .range([h - margin.bottom, margin.top]);
 
+  if (scene === 4)
+  {
+    const zoom = d3.zoom()
+      .scaleExtent([1, 20])
+      .translateExtent([[0, 0], [w, h]])
+      .extent([[0, 0], [w, h]])
+      .on("zoom", function(event)
+      {
+        const newX = event.transform.rescaleX(x);
+
+        svg.selectAll("*").remove();
+
+        const xAxis = d3.axisBottom(newX);
+        const yAxis = d3.axisLeft(yClose);
+
+        const lineCloseZoom = d3.line()
+          .x(d => newX(d.date))
+          .y(d => yClose(d.close));
+
+        const yVol = d3.scaleLinear()
+          .domain(d3.extent(sceneData, d => d.SD20))
+          .range([h - margin.bottom, margin.top]);
+
+        const lineVolZoom = d3.line()
+          .x(d => newX(d.date))
+          .y(d => yVol(d.SD20));
+
+        const lineMA20Zoom = d3.line()
+          .x(d => newX(d.date))
+          .y(d => yClose(d.MA20));
+
+        const lineUpperZoom = d3.line()
+          .x(d => newX(d.date))
+          .y(d => yClose(d.upper));
+
+        const lineLowerZoom = d3.line()
+          .x(d => newX(d.date))
+          .y(d => yClose(d.lower));
+
+        if (document.getElementById("show-close").checked)
+        {
+          svg.append("path")
+            .datum(sceneData)
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-width", 3)
+            .attr("d", lineCloseZoom);
+        }
+
+        if (document.getElementById("show-volatility").checked)
+        {
+          svg.append("path")
+            .datum(sceneData)
+            .attr("fill", "none")
+            .attr("stroke", "orange")
+            .attr("stroke-width", 3)
+            .attr("d", lineVolZoom);
+        }
+
+        if (document.getElementById("show-bands").checked)
+        {
+          svg.append("path")
+            .datum(sceneData)
+            .attr("fill", "none")
+            .attr("stroke", "lightgreen")
+            .attr("stroke-width", 3)
+            .attr("d", lineMA20Zoom);
+
+          svg.append("path")
+            .datum(sceneData)
+            .attr("fill", "rgba(255,0,0,0.20)")
+            .attr("stroke", "none")
+            .attr("pointer-events", "none")
+            .attr("d", d3.area()
+              .x(d => newX(d.date))
+              .y0(d => yClose(d.lower))
+              .y1(d => yClose(d.upper))
+            );
+
+          svg.append("path")
+            .datum(sceneData)
+            .attr("fill", "none")
+            .attr("stroke", "darkred")
+            .attr("stroke-width", 4)
+            .attr("d", lineUpperZoom);
+
+          svg.append("path")
+            .datum(sceneData)
+            .attr("fill", "none")
+            .attr("stroke", "maroon")
+            .attr("stroke-width", 4)
+            .attr("stroke-dasharray", "6 6")
+            .attr("d", lineLowerZoom);
+        }
+
+        svg.append("g")
+          .attr("transform", `translate(0,${h - margin.bottom})`)
+          .call(xAxis);
+
+        svg.append("g")
+          .attr("transform", `translate(${margin.left},0)`)
+          .call(yAxis);
+      });
+
+    svg.call(zoom);
+  }
+
   const tooltip = d3.select("#tooltip");
   const bisectDate = d3.bisector(d => d.date).left;
 
