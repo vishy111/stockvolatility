@@ -2,6 +2,7 @@ let scene = 1;
 
 function drawScene(scene, data) {
 
+  
   d3.select("#chart").selectAll("*").remove();
 
   const w = 1200;
@@ -64,12 +65,12 @@ function drawScene(scene, data) {
       .attr("d", lineClose);
 
     const yVol = d3.scaleLinear()
-      .domain(d3.extent(sceneData, d => d.sd20))
+      .domain(d3.extent(sceneData, d => d.SD20))
       .range([h - margin.bottom, margin.top]);
 
     const lineVol = d3.line()
       .x(d => x(d.date))
-      .y(d => yVol(d.sd20));
+      .y(d => yVol(d.SD20));
 
     svg.append("path")
       .datum(sceneData)
@@ -131,11 +132,32 @@ function drawScene(scene, data) {
       .attr("stroke-dasharray", "6 6")
       .attr("d", lineLower);
 
+
+    
     svg.append("text")
       .attr("x", 30)
       .attr("y", 40)
       .style("font-size", "20px")
-      .text("Bands widen dramatically during volatile periods.");
+      .style("font-weight", "bold")
+      .text("Understanding Market Volatility (AAPL)");
+
+    svg.append("text")
+      .attr("x", 30)
+      .attr("y", 70)
+      .style("font-size", "16px")
+      .text("• Lower band stays close to the price when volatility (SD20) is low.");
+
+    svg.append("text")
+      .attr("x", 30)
+      .attr("y", 95)
+      .style("font-size", "16px")
+      .text("• Price can dip below the lower band during sharp selloffs or breakdown events.");
+
+    svg.append("text")
+      .attr("x", 30)
+      .attr("y", 120)
+      .style("font-size", "16px")
+      .text("• Upper band rises sharply when volatility increases, creating wider bands.");
   }
 
   svg.append("g")
@@ -154,31 +176,12 @@ d3.csv("AAPL.csv").then(function(data) {
   data.forEach(function(d) {
     d.date = parseDate(d.Date);
     d.close = +d["Close(t)"];
+    d.SD20 = +d.SD20;
+    d.upper = +d.Upper_Band;
+    d.lower = +d.Lower_Band;
   });
 
-  for (let i = 0; i < data.length; i++) {
-
-    if (i < 20) {
-      data[i].ma20 = data[i].close;
-      data[i].sd20 = 0;
-    } else {
-
-      let window = data.slice(i - 19, i + 1);
-      let closes = window.map(d => d.close);
-
-      let mean = closes.reduce((a, b) => a + b, 0) / 20;
-
-      let variance = closes.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / 20;
-      let sd = Math.sqrt(variance);
-
-      data[i].ma20 = mean;
-      data[i].sd20 = sd;
-    }
-
-    data[i].upper = data[i].ma20 + (2 * data[i].sd20);
-    data[i].lower = data[i].ma20 - (2 * data[i].sd20);
-  }
-
+  
   window.globalData = data;
 
   drawScene(scene, data);
