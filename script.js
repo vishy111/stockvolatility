@@ -47,4 +47,7 @@ d3.csv("AAPL.csv").then(function(data) {
     .attr("transform", `translate(${margin.left},0)`)
     .call(d3.axisLeft(y));
   
+  console.log("JS running");
+
+  
 });
