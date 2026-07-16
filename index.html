@@ -1,212 +1,352 @@
-<!DOCTYPE html>
-<html>
-<head>
+let scene = 1;
+let currentRange = "full";
 
-  <meta charset="UTF-8">
-  <title>AAPL Volatility</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+function updateButtons( ) 
+{
+  const backBtn = document.getElementById("back");
+  const nextBtn = document.getElementById("next");
 
-</head>
-<body>
+  backBtn.classList.remove("disabled");
+  nextBtn.classList.remove("disabled");
 
-  <h1 style="text-align:center;">Understanding Market Volatility (AAPL)</h1>
+  if (scene === 1) backBtn.classList.add("disabled");
+  if (scene === 4) nextBtn.classList.add("disabled");
+}
 
-  <div id="summary1" style="
-      text-align:center;
-      font-size:20px;
-      font-weight:bold;
-      margin:15px auto;
-      display:block;
-  ">
-    Scene 1: Tracking AAPL’s closing price trend
-  </div>
+function drawScene(scene, data) 
+{
 
-  <div id="summary2" style="
-      text-align:center;
-      font-size:20px;
-      font-weight:bold;
-      margin:15px auto;
-      display:none;
-  ">
-    Scene 2: Measuring volatility with SD20
-  </div>
+  d3.select("#chart").selectAll("*").remove();
 
-  <div id="summary3" style="
-      text-align:center;
-      font-size:20px;
-      font-weight:bold;
-      margin:15px auto;
-      display:none;
-  ">
-    Scene 3: Exploring Bollinger Bands
-  </div>
+  const w = 1200;
+  const h = 650;
+  const margin = { top: 60, right: 60, bottom: 60, left: 80 };
 
-  <div id="summary4" style="
-      text-align:center;
-      font-size:20px;
-      font-weight:bold;
-      margin:15px auto;
-      display:none;
-  ">
-    Scene 4: Free Exploration Mode
-  </div>
+  let sceneData = data;
 
-  <div id="annotation1" style="
-      font-size:18px;
-      margin:20px auto;
-      line-height:1.6;
-      max-width:900px;
-      background:#f0f4ff;
-      padding:20px;
-      border-left:6px solid #1e88e5;
-      border-radius:6px;
-      display:block;
-  ">
-    <ul style="margin:0; padding-left:20px;">
-      <li>The blue line shows AAPL’s closing price over time.</li>
-      <li>In early 2020, the price climbs steadily before dropping sharply during the March 2020 market selloff.</li>
-      <li>This rise‑and‑fall pattern highlights how quickly market conditions can change.</li>
-      <li>(Hover over the chart to see exact values.)</li>
-    </ul>
-  </div>
+  if (scene === 3) 
+  {
+    sceneData = data.filter(d => d.date >= new Date("2020-03-15") && d.date <= new Date("2020-03-31"));
+  }
 
-  <div id="annotation2" style="
-      font-size:18px;
-      margin:20px auto;
-      line-height:1.6;
-      max-width:900px;
-      background:#f0f4ff;
-      padding:20px;
-      border-left:6px solid #1e88e5;
-      border-radius:6px;
-      display:none;
-  ">
-    <ul style="margin:0; padding-left:20px;">
-      <li>The orange line (SD20) measures volatility.</li>
-      <li>Volatility stays low during calm periods but spikes sharply during market stress.</li>
-      <li>The mid‑March 2020 spike shows how fear and uncertainty can rapidly increase volatility.</li>
-      <li>(Hover over the chart to see exact values.)</li>
-    </ul>
-  </div>
+  if (scene === 4)
+  {
+    if (currentRange === "full")
+    {
+      sceneData = data;
+    }
+    if (currentRange === "march")
+    {
+      sceneData = data.filter(d => d.date >= new Date("2020-03-01") && d.date <= new Date("2020-03-31"));
+    }
+    if (currentRange === "late-march")
+    {
+      sceneData = data.filter(d => d.date >= new Date("2020-03-15") && d.date <= new Date("2020-03-31"));
+    }
+  }
 
-  <div id="annotation3" style="
-      font-size:18px;
-      margin:20px auto;
-      line-height:1.6;
-      max-width:900px;
-      background:#f0f4ff;
-      padding:20px;
-      border-left:6px solid #1e88e5;
-      border-radius:6px;
-      display:none;
-      position:relative;
-  ">
-    <div style="
-        position:absolute;
-        top:-10px;
-        right:0;
-    ">
-      <button id="bb-button" class="bb-btn" style="
-            display:none;
-      ">What’s a Bollinger Band?</button>
-    </div>
+  const svg = d3.select("#chart")
+    .append("svg")
+    .attr("width", w)
+    .attr("height", h);
 
-    <ul style="margin:0; padding-left:20px;">
-      <li>The dark red upper band marks unusually high price levels.</li>
-      <li>The dashed maroon lower band marks unusually low price levels.</li>
-      <li>The blue price line is hugging the lower band, meaning prices have been consistently pushed into the “low zone.”</li>
-      <li>This often signals strong selling pressure or an oversold condition.</li>
-      <li>Oversold conditions can sometimes lead to a bounce, but they also indicate market stress.</li>
-      <li>The width of the bands shows volatility: wide bands mean big swings, narrow bands mean calm periods.</li>
-      <li>(Hover over the chart to see exact values.)</li>
-    </ul>
-  </div>
+  const x = d3.scaleTime( )
+    .domain(d3.extent(sceneData, d => d.date))
+    .range([margin.left, w - margin.right]);
 
-  <div id="annotation4" style="
-      font-size:18px;
-      margin:20px auto;
-      line-height:1.6;
-      max-width:900px;
-      background:#f0f4ff;
-      padding:20px;
-      border-left:6px solid #1e88e5;
-      border-radius:6px;
-      display:none;
-  ">
-    <ul style="margin:0; padding-left:20px;">
-      <li>Use the toggles below to explore the chart freely.</li>
-      <li>You can turn volatility, Bollinger Bands, and volume on or off.</li>
-      <li>Try comparing two dates or drawing a quick trendline.</li>
-      <li>This mode lets you experiment and discover patterns on your own.</li>
-    </ul>
-  </div>
+  const yClose = d3.scaleLinear()
+    .domain([
+      d3.min(sceneData, d => d.lower),
+      d3.max(sceneData, d => d.upper)
+    ])
+    .range([h - margin.bottom, margin.top]);
 
-  <div id="bb-info" style="
-        display:none;
-        background:#f9f3ff;
-        border-left:6px solid purple;
-        padding:15px 20px;
-        margin:15px auto;
-        max-width:900px;
-        border-radius:6px;
-        font-size:16px;
-        line-height:1.5;
-  ">
-    <strong>What’s a Bollinger Band?</strong><br><br>
+  const tooltip = d3.select("#tooltip");
+  const bisectDate = d3.bisector(d => d.date).left;
 
-    <em>Bollinger Bands help traders understand market volatility by showing when prices stretch unusually high or low compared to recent behavior.</em><br><br>
+  const hoverCircle = svg.append("circle")
+    .attr("r", 6)
+    .attr("class", "tooltip-circle")
+    .style("display", "none");
 
-    <ul style="margin:0; padding-left:20px;">
-      <li>Upper Band: marks unusually high prices.</li>
-      <li>Lower Band: marks unusually low prices.</li>
-      <li>Middle Band (MA20): a 20‑day average used as a reference point.</li>
-      <li>Band width shows volatility — wide means big swings, narrow means calm.</li>
-      <li>Prices touching upper or lower bands help identify extremes.</li>
-    </ul>
-  </div>
+  const hoverCircleVol = svg.append("circle")
+    .attr("r", 6)
+    .attr("class", "tooltip-circle")
+    .style("fill", "orange")
+    .style("display", "none");
 
-  <div id="legend" style="
-    margin:10px auto;
-    font-size:16px;
-    line-height:1.6;
-    max-width:900px;
-  ">
-    <div><span style="display:inline-block;width:20px;height:4px;background:steelblue;margin-right:8px;"></span>Close Price</div>
-    <div><span style="display:inline-block;width:20px;height:4px;background:orange;margin-right:8px;"></span>Volatility (SD20)</div>
-    <div><span style="display:inline-block;width:20px;height:4px;background:lightgreen;margin-right:8px;"></span>Middle Band (MA20)</div>
-    <div><span style="display:inline-block;width:20px;height:4px;background:darkred;margin-right:8px;"></span>Upper Band</div>
-    <div><span style="display:inline-block;width:20px;height:0;border-bottom:4px dashed maroon;margin-right:8px;"></span>Lower Band</div>
-  </div>
+  svg.append("rect")
+    .attr("width", w)
+    .attr("height", h)
+    .attr("fill", "none")
+    .attr("pointer-events", "all")
+    .on("mousemove", function(event) 
+    {
+      const mouseX = d3.pointer(event)[0];
+      const mouseY = d3.pointer(event)[1];
+      const xDate = x.invert(mouseX);
+      const i = bisectDate(sceneData, xDate);
 
-  <div id="tooltip" style="
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    padding: 8px 12px;
-    border-radius: 6px;
-    pointer-events: none;
-    font-size: 14px;
-    display: none;
-  "></div>
+      const d = sceneData[i];
+      if (!d) return;
 
-  <div id="chart" style="text-align:center;"></div>
+      let hoveredColor = "steelblue";
+      let hoveredY = yClose(d.close);
 
-  <div id="controls" style="text-align:center; margin-top:20px;">
-    <button id="back" class="nav-btn">Back</button>
-    <button id="next" class="nav-btn">Next</button>
+      if (scene >= 2) 
+      {
+        const yVol = d3.scaleLinear()
+          .domain(d3.extent(sceneData, d => d.SD20))
+          .range([h - margin.bottom, margin.top]);
 
-    <div id="explore-controls" style="display:none; margin-top:10px;">
-      <label><input type="checkbox" id="show-bands" checked> Bollinger Bands</label>
-      <label><input type="checkbox" id="show-volatility" checked> Volatility (SD20)</label>
-      <label><input type="checkbox" id="show-volume"> Volume</label>
-      <label><input type="checkbox" id="compare-dates"> Compare Two Dates</label>
-      <label><input type="checkbox" id="draw-trendline"> Draw Trendline</label>
-      <button id="reset-view" class="nav-btn" style="padding:8px 16px; font-size:16px;">Reset View</button>
-    </div>
-  </div>
+        const distClose = Math.abs(yClose(d.close) - mouseY);
+        const distVol = Math.abs(yVol(d.SD20) - mouseY);
 
-  <script src="script.js"></script>
+        if (distVol < distClose) 
+        {
+          hoveredColor = "orange";
+          hoveredY = yVol(d.SD20);
 
-</body>
-</html>
+          hoverCircleVol
+            .style("display", "")
+            .attr("cx", x(d.date))
+            .attr("cy", hoveredY);
+
+          hoverCircle.style("display", "none");
+        }
+        else 
+        {
+          hoverCircle
+            .style("display", "")
+            .attr("cx", x(d.date))
+            .attr("cy", hoveredY);
+
+          hoverCircleVol.style("display", "none");
+        }
+      }
+      else 
+      {
+        hoverCircle
+          .style("display", "")
+          .attr("cx", x(d.date))
+          .attr("cy", hoveredY);
+      }
+
+      let html = "<strong>" + d.date.toLocaleDateString() + "</strong><br>" +
+                 "Close: " + d.close.toFixed(2);
+
+      if (scene >= 2) 
+      {
+        html += "<br>SD20: " + d.SD20.toFixed(2);
+      }
+
+      if (scene === 3 || scene === 4) 
+      {
+        html += "<br>Upper: " + d.upper.toFixed(2) +
+                "<br>Lower: " + d.lower.toFixed(2);
+      }
+
+      tooltip
+        .style("display", "block")
+        .style("border-left", "6px solid " + hoveredColor)
+        .style("left", (event.pageX + 15) + "px")
+        .style("top", (event.pageY - 20) + "px")
+        .html(html);
+    })
+    .on("mouseout", function() 
+    {
+      hoverCircle.style("display", "none");
+      hoverCircleVol.style("display", "none");
+      tooltip.style("display", "none");
+    });
+
+  const drawClose = () => {
+    const lineClose = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.close));
+
+    svg.append("path")
+      .datum(sceneData)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 3)
+      .attr("d", lineClose);
+  };
+
+  const drawVol = () => {
+    const yVol = d3.scaleLinear()
+      .domain(d3.extent(sceneData, d => d.SD20))
+      .range([h - margin.bottom, margin.top]);
+
+    const lineVol = d3.line()
+      .x(d => x(d.date))
+      .y(d => yVol(d.SD20));
+
+    svg.append("path")
+      .datum(sceneData)
+      .attr("fill", "none")
+      .attr("stroke", "orange")
+      .attr("stroke-width", 3)
+      .attr("d", lineVol);
+  };
+
+  const drawBands = () => {
+    const lineMA20 = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.MA20));
+
+    svg.append("path")
+      .datum(sceneData)
+      .attr("fill", "none")
+      .attr("stroke", "lightgreen")
+      .attr("stroke-width", 3)
+      .attr("d", lineMA20);
+
+    svg.append("path")
+      .datum(sceneData)
+      .attr("fill", "rgba(255,0,0,0.20)")
+      .attr("stroke", "none")
+      .attr("pointer-events", "none")
+      .attr("d", d3.area()
+        .x(d => x(d.date))
+        .y0(d => yClose(d.lower))
+        .y1(d => yClose(d.upper))
+      );
+
+    const lineUpper = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.upper));
+
+    const lineLower = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.lower));
+
+    svg.append("path")
+      .datum(sceneData)
+      .attr("fill", "none")
+      .attr("stroke", "darkred")
+      .attr("stroke-width", 4)
+      .attr("d", lineUpper);
+
+    svg.append("path")
+      .datum(sceneData)
+      .attr("fill", "none")
+      .attr("stroke", "maroon")
+      .attr("stroke-width", 4)
+      .attr("stroke-dasharray", "6 6")
+      .attr("d", lineLower);
+  };
+
+  if (scene === 1) 
+  {
+    drawClose();
+  }
+
+  if (scene === 2) {
+    drawClose();
+    drawVol();
+  }
+
+  if (scene === 3) 
+  {
+    drawClose();
+    drawBands();
+  }
+
+  if (scene === 4) 
+  {
+    if (document.getElementById("show-close").checked) drawClose();
+    if (document.getElementById("show-bands").checked) drawBands();
+    if (document.getElementById("show-volatility").checked) drawVol();
+  }
+
+  svg.append("g")
+    .attr("transform", `translate(0,${h - margin.bottom})`)
+    .call(d3.axisBottom(x));
+
+  svg.append("g")
+    .attr("transform", `translate(${margin.left},0)`)
+    .call(d3.axisLeft(yClose));
+
+  if (scene === 3) 
+  {
+    document.getElementById("bb-button").style.display = "inline-block";
+  }
+  else 
+  {
+    document.getElementById("bb-button").style.display = "none";
+    document.getElementById("bb-info").style.display = "none";
+  }
+
+  if (scene === 4)
+  {
+    document.getElementById("explore-controls").style.display = "block";
+  }
+  else
+  {
+    document.getElementById("explore-controls").style.display = "none";
+  }
+
+  updateButtons();
+
+document.getElementById("summary1").style.display = scene === 1 ? "block" : "none";
+document.getElementById("summary2").style.display = scene === 2 ? "block" : "none";
+document.getElementById("summary3").style.display = scene === 3 ? "block" : "none";
+document.getElementById("summary4").style.display = scene === 4 ? "block" : "none";
+
+document.getElementById("annotation1").style.display = scene === 1 ? "block" : "none";
+document.getElementById("annotation2").style.display = scene === 2 ? "block" : "none";
+document.getElementById("annotation3").style.display = scene === 3 ? "block" : "none";
+document.getElementById("annotation4").style.display = scene === 4 ? "block" : "none";
+}
+
+d3.csv("AAPL.csv").then(function(data) {
+
+  const parseDate = d3.timeParse("%Y-%m-%d");
+
+  data.forEach(function(d) {
+    d.date = parseDate(d.Date);
+    d.close = +d["Close(t)"];
+    d.SD20 = +d.SD20;
+    d.MA20 = +d.MA20;
+    d.upper = d.MA20 + (2 * d.SD20);
+    d.lower = d.MA20 - (2 * d.SD20);
+  });
+
+  window.globalData = data;
+  
+  drawScene(scene, data);
+});
+
+document.getElementById("next").onclick = () => {
+  if (scene < 4) 
+  {
+    scene++;
+    drawScene(scene, window.globalData);
+  }
+};
+
+document.getElementById("back").onclick = () => {
+  if (scene > 1) 
+  {
+    scene--;
+    drawScene(scene, window.globalData);
+  }
+};
+
+document.getElementById("bb-button").onclick = () => {
+  const box = document.getElementById("bb-info");
+  box.style.display = box.style.display === "none" ? "block" : "none";
+};
+
+document.getElementById("reset-view").onclick = () => {
+  drawScene(4, window.globalData);
+};
+
+document.getElementById("time-range").onchange = () => {
+  currentRange = document.getElementById("time-range").value;
+  if (scene === 4) 
+  {
+    drawScene(4, window.globalData);
+  }
+};
