@@ -236,6 +236,18 @@ function drawScene(scene, data)
       .attr("stroke-width", 3)
       .attr("d", lineClose);
 
+    const lineMA20 = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.MA20));
+
+    svg.append("path")
+      .datum(sceneData)
+      .attr("fill", "none")
+      .attr("stroke", "purple")
+      .attr("stroke-width", 3)
+      .attr("d", lineMA20);
+
+
     svg.append("path")
       .datum(sceneData)
       .attr("fill", "rgba(255,0,0,0.20)")
@@ -279,6 +291,15 @@ function drawScene(scene, data)
     .attr("transform", `translate(${margin.left},0)`)
     .call(d3.axisLeft(yClose));
 
+  if (scene === 3) 
+  {
+    document.getElementById("bb-button").style.display = "inline-block";
+  }
+  else 
+  {
+    document.getElementById("bb-button").style.display = "none";
+    document.getElementById("bb-info").style.display = "none";
+  }
   setAnnotation(scene);
   updateButtons();
 }
@@ -315,4 +336,9 @@ document.getElementById("back").onclick = () => {
     scene--;
     drawScene(scene, window.globalData);
   }
+};
+
+document.getElementById("bb-button").onclick = () => {
+  const box = document.getElementById("bb-info");
+  box.style.display = box.style.display === "none" ? "block" : "none";
 };
