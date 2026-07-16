@@ -129,7 +129,7 @@ function drawScene(scene, data) {
       .attr("x", 20)
       .attr("y", 30)
       .style("font-size", "14px")
-      .text("Bands widen during volatility and squeeze during calm periods.");
+      .text("Bands widen during periods of volatility and squeeze during calm periods.");
   }
 
   svg.append("g")
