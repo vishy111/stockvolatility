@@ -155,14 +155,9 @@ d3.csv("AAPL.csv").then(function(data) {
     d.date = parseDate(d.Date);
     d.close = +d["Close(t)"];
     d.SD20 = +d.SD20;
-    d.upper = +d.Upper_Band;
-    d.lower = +d.Lower_Band;
-  });
-
-  data.forEach(d => {
-    if (d.lower > d.close) {
-      console.log("BAD DATA:", d.Date, d.lower, d.close);
-    }
+    d.MA20 = +d.MA20;
+    d.upper = d.MA20 + (2 * d.SD20);
+    d.lower = d.MA20 - (2 * d.SD20);
   });
 
   window.globalData = data;
