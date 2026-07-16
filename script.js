@@ -18,7 +18,10 @@ function drawScene(scene, data) {
     .range([margin.left, w - margin.right]);
 
   const yClose = d3.scaleLinear()
-    .domain(d3.extent(data, d => d.close))
+    .domain([
+      d3.min(data, d => d.lower),
+      d3.max(data, d => d.upper)
+    ])
     .range([h - margin.bottom, margin.top]);
 
   if (scene === 1) {
@@ -73,13 +76,11 @@ function drawScene(scene, data) {
       .attr("x", 20)
       .attr("y", 30)
       .style("font-size", "14px")
-      .text("Periods of high volatility corresponds to sharp price movements.");
+      .text("Periods of high volatility correspond to sharp price movements.");
   }
 
-  
   if (scene === 3) {
 
-    
     const lineClose = d3.line()
       .x(d => x(d.date))
       .y(d => yClose(d.close));
@@ -91,7 +92,6 @@ function drawScene(scene, data) {
       .attr("stroke-width", 2)
       .attr("d", lineClose);
 
-    
     const lineUpper = d3.line()
       .x(d => x(d.date))
       .y(d => yClose(d.upper));
@@ -118,7 +118,7 @@ function drawScene(scene, data) {
       .attr("x", 20)
       .attr("y", 30)
       .style("font-size", "14px")
-      .text("Bands widen during periods of volatility and squeeze during calm periods.");
+      .text("Bands widen during volatility and squeeze during calm periods.");
   }
 
   svg.append("g")
@@ -148,7 +148,6 @@ d3.csv("AAPL.csv").then(function(data) {
 });
 
 document.getElementById("next").onclick = () => {
-  
   scene = Math.min(scene + 1, 4);
   drawScene(scene, window.globalData);
 };
