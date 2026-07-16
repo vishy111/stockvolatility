@@ -2,11 +2,11 @@ console.log("JS loaded");
 
 d3.csv("AAPL.csv").then(function(data) {
 
-  const parseDate = d3.timeParse("%m/%d/%Y");
+  const parseDate = d3.timeParse("%Y-%m-%d");
 
   data.forEach(function(d) {
-    d.date = parseDate(d.Date_col?.trim());
-    d.close = +d["Close(t)"]?.trim();
+    d.date = parseDate(d.Date);
+    d.close = +d["Close(t)"];
   });
 
   console.log("COLUMN NAMES:", Object.keys(data[0]));
