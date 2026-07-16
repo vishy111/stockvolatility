@@ -1,4 +1,5 @@
 let scene = 1;
+let currentRange = "full";
 
 function updateButtons( ) 
 {
@@ -9,7 +10,6 @@ function updateButtons( )
   nextBtn.classList.remove("disabled");
 
   if (scene === 1) backBtn.classList.add("disabled");
-  if (scene === 3) nextBtn.classList.add("disabled");
   if (scene === 4) nextBtn.classList.add("disabled");
 }
 
@@ -31,7 +31,18 @@ function drawScene(scene, data)
 
   if (scene === 4)
   {
-    sceneData = data;
+    if (currentRange === "full")
+    {
+      sceneData = data;
+    }
+    if (currentRange === "march")
+    {
+      sceneData = data.filter(d => d.date >= new Date("2020-03-01") && d.date <= new Date("2020-03-31"));
+    }
+    if (currentRange === "late-march")
+    {
+      sceneData = data.filter(d => d.date >= new Date("2020-03-15") && d.date <= new Date("2020-03-31"));
+    }
   }
 
   const svg = d3.select("#chart")
@@ -149,49 +160,27 @@ function drawScene(scene, data)
       tooltip.style("display", "none");
     });
 
-  const lineClose = d3.line()
-    .x(d => x(d.date))
-    .y(d => yClose(d.close));
+  const drawClose = () => {
+    const lineClose = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.close));
 
-  const lineVol = d3.line()
-    .x(d => x(d.date))
-    .y(d => {
-      const yVol = d3.scaleLinear()
-        .domain(d3.extent(sceneData, d => d.SD20))
-        .range([h - margin.bottom, margin.top]);
-      return yVol(d.SD20);
-    });
-
-  const lineMA20 = d3.line()
-    .x(d => x(d.date))
-    .y(d => yClose(d.MA20));
-
-  const lineUpper = d3.line()
-    .x(d => x(d.date))
-    .y(d => yClose(d.upper));
-
-  const lineLower = d3.line()
-    .x(d => x(d.date))
-    .y(d => yClose(d.lower));
-
-  if (scene === 1)
-  {
     svg.append("path")
       .datum(sceneData)
       .attr("fill", "none")
       .attr("stroke", "steelblue")
       .attr("stroke-width", 3)
       .attr("d", lineClose);
-  }
+  };
 
-  if (scene === 2)
-  {
-    svg.append("path")
-      .datum(sceneData)
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 3)
-      .attr("d", lineClose);
+  const drawVol = () => {
+    const yVol = d3.scaleLinear()
+      .domain(d3.extent(sceneData, d => d.SD20))
+      .range([h - margin.bottom, margin.top]);
+
+    const lineVol = d3.line()
+      .x(d => x(d.date))
+      .y(d => yVol(d.SD20));
 
     svg.append("path")
       .datum(sceneData)
@@ -199,16 +188,12 @@ function drawScene(scene, data)
       .attr("stroke", "orange")
       .attr("stroke-width", 3)
       .attr("d", lineVol);
-  }
+  };
 
-  if (scene === 3)
-  {
-    svg.append("path")
-      .datum(sceneData)
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 3)
-      .attr("d", lineClose);
+  const drawBands = () => {
+    const lineMA20 = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.MA20));
 
     svg.append("path")
       .datum(sceneData)
@@ -228,6 +213,14 @@ function drawScene(scene, data)
         .y1(d => yClose(d.upper))
       );
 
+    const lineUpper = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.upper));
+
+    const lineLower = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.lower));
+
     svg.append("path")
       .datum(sceneData)
       .attr("fill", "none")
@@ -242,91 +235,29 @@ function drawScene(scene, data)
       .attr("stroke-width", 4)
       .attr("stroke-dasharray", "6 6")
       .attr("d", lineLower);
+  };
+
+  if (scene === 1) 
+  {
+    drawClose();
   }
 
-  if (scene === 4)
+  if (scene === 2) {
+    drawClose();
+    drawVol();
+  }
+
+  if (scene === 3) 
   {
-    svg.append("path")
-      .datum(sceneData)
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 3)
-      .attr("d", lineClose);
+    drawClose();
+    drawBands();
+  }
 
-    if (document.getElementById("show-volatility").checked)
-    {
-      svg.append("path")
-        .datum(sceneData)
-        .attr("fill", "none")
-        .attr("stroke", "orange")
-        .attr("stroke-width", 3)
-        .attr("d", lineVol);
-    }
-
-    if (document.getElementById("show-bands").checked)
-    {
-      svg.append("path")
-        .datum(sceneData)
-        .attr("fill", "none")
-        .attr("stroke", "lightgreen")
-        .attr("stroke-width", 3)
-        .attr("d", lineMA20);
-
-      svg.append("path")
-        .datum(sceneData)
-        .attr("fill", "rgba(255,0,0,0.20)")
-        .attr("stroke", "none")
-        .attr("pointer-events", "none")
-        .attr("d", d3.area()
-          .x(d => x(d.date))
-          .y0(d => yClose(d.lower))
-          .y1(d => yClose(d.upper))
-        );
-
-      svg.append("path")
-        .datum(sceneData)
-        .attr("fill", "none")
-        .attr("stroke", "darkred")
-        .attr("stroke-width", 4)
-        .attr("d", lineUpper);
-
-      svg.append("path")
-        .datum(sceneData)
-        .attr("fill", "none")
-        .attr("stroke", "maroon")
-        .attr("stroke-width", 4)
-        .attr("stroke-dasharray", "6 6")
-        .attr("d", lineLower);
-    }
-
-    if (document.getElementById("draw-trendline").checked)
-    {
-      const first = sceneData[0];
-      const last = sceneData[sceneData.length - 1];
-      svg.append("line")
-        .attr("x1", x(first.date))
-        .attr("y1", yClose(first.close))
-        .attr("x2", x(last.date))
-        .attr("y2", yClose(last.close))
-        .attr("stroke", "black")
-        .attr("stroke-width", 3);
-    }
-
-    if (document.getElementById("compare-dates").checked)
-    {
-      const first = sceneData[0];
-      const last = sceneData[sceneData.length - 1];
-      svg.append("circle")
-        .attr("cx", x(first.date))
-        .attr("cy", yClose(first.close))
-        .attr("r", 8)
-        .attr("fill", "green");
-      svg.append("circle")
-        .attr("cx", x(last.date))
-        .attr("cy", yClose(last.close))
-        .attr("r", 8)
-        .attr("fill", "red");
-    }
+  if (scene === 4) 
+  {
+    if (document.getElementById("show-close").checked) drawClose();
+    if (document.getElementById("show-bands").checked) drawBands();
+    if (document.getElementById("show-volatility").checked) drawVol();
   }
 
   svg.append("g")
@@ -410,4 +341,12 @@ document.getElementById("bb-button").onclick = () => {
 
 document.getElementById("reset-view").onclick = () => {
   drawScene(4, window.globalData);
+};
+
+document.getElementById("time-range").onchange = () => {
+  currentRange = document.getElementById("time-range").value;
+  if (scene === 4) 
+  {
+    drawScene(4, window.globalData);
+  }
 };
