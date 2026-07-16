@@ -151,13 +151,23 @@ d3.csv("AAPL.csv").then(function(data) {
 
   const parseDate = d3.timeParse("%Y-%m-%d");
 
-  data.forEach(function(d) {
+  data.forEach(function(d, i) {
     d.date = parseDate(d.Date);
     d.close = +d["Close(t)"];
     d.SD20 = +d.SD20;
-    d.upper = +d.Upper_Band;
-    d.lower = +d.Lower_Band;
   });
+
+  for (let i = 0; i < data.length; i++) {
+    if (i < 20) {
+      data[i].ma20 = data[i].close;
+    } else {
+      let sum = 0;
+      for (let j = i - 19; j <= i; j++) sum += data[j].close;
+      data[i].ma20 = sum / 20;
+    }
+    data[i].upper = data[i].ma20 + (2 * data[i].SD20);
+    data[i].lower = data[i].ma20 - (2 * data[i].SD20);
+  }
 
   window.globalData = data;
 
