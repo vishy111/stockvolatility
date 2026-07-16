@@ -1,5 +1,32 @@
 let scene = 1;
 
+function setAnnotation(scene) {
+  const annotationEl = document.getElementById("annotation");
+  if (!annotationEl) return;
+
+  if (scene === 1) 
+  {
+    annotationEl.textContent =
+      "Scene 1: The blue line shows AAPL’s closing price over time. "  +
+      "Even though it fluctuates day to day, you can still see broader upward or downward trends.";
+  } else if (scene === 2) 
+  {
+    annotationEl.textContent =
+      "Scene 2: The orange line (SD20) measures volatility. " +
+      "When SD20 rises, price movements become larger and more unstable. "  + 
+      "When SD20 falls, the market is calmer and price changes are smaller.";
+  } else if (scene === 3) 
+  {
+    annotationEl.textContent =
+      "Scene 3: The red bands around the blue price line are Bollinger Bands based on MA20 and SD20. "   + 
+      "The lower band stays close to the price when volatility (SD20) is low, so the blue line can sometimes dip below it during sharp selloffs. "   +
+      "The upper band can sit much higher than the price when volatility increases, causing the bands to widen and highlight periods of market stress.";
+  } else 
+  {
+    annotationEl.textContent = "";
+  }
+}
+
 function drawScene(scene, data) {
 
   d3.select("#chart").selectAll("*").remove();
@@ -14,6 +41,7 @@ function drawScene(scene, data) {
     sceneData = data.filter(d => d.date >= new Date("2020-03-15") && d.date <= new Date("2020-03-31"));
   }
 
+  
   const svg = d3.select("#chart")
     .append("svg")
     .attr("width", w)
@@ -145,6 +173,8 @@ function drawScene(scene, data) {
   svg.append("g")
     .attr("transform", `translate(${margin.left},0)`)
     .call(d3.axisLeft(yClose));
+
+  setAnnotation(scene);
 }
 
 d3.csv("AAPL.csv").then(function(data) {
@@ -166,7 +196,7 @@ d3.csv("AAPL.csv").then(function(data) {
 });
 
 document.getElementById("next").onclick = () => {
-  scene = Math.min(scene + 1, 4);
+  scene = Math.min(scene + 1, 3);
   drawScene(scene, window.globalData);
 };
 
