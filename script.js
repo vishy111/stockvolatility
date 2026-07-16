@@ -4,9 +4,15 @@ function drawScene(scene, data) {
 
   d3.select("#chart").selectAll("*").remove();
 
-  const w = 800;
-  const h = 400;
-  const margin = { top: 40, right: 40, bottom: 40, left: 60 };
+  const w = 1200;
+  const h = 650;
+  const margin = { top: 60, right: 60, bottom: 60, left: 80 };
+
+  let sceneData = data;
+
+  if (scene === 3) {
+    sceneData = data.filter(d => d.date >= new Date("2020-02-01") && d.date <= new Date("2020-05-01"));
+  }
 
   const svg = d3.select("#chart")
     .append("svg")
@@ -14,13 +20,13 @@ function drawScene(scene, data) {
     .attr("height", h);
 
   const x = d3.scaleTime()
-    .domain(d3.extent(data, d => d.date))
+    .domain(d3.extent(sceneData, d => d.date))
     .range([margin.left, w - margin.right]);
 
   const yClose = d3.scaleLinear()
     .domain([
-      d3.min(data, d => d.lower),
-      d3.max(data, d => d.upper)
+      d3.min(sceneData, d => d.lower),
+      d3.max(sceneData, d => d.upper)
     ])
     .range([h - margin.bottom, margin.top]);
 
@@ -31,16 +37,16 @@ function drawScene(scene, data) {
       .y(d => yClose(d.close));
 
     svg.append("path")
-      .datum(data)
+      .datum(sceneData)
       .attr("fill", "none")
       .attr("stroke", "steelblue")
-      .attr("stroke-width", 2)
+      .attr("stroke-width", 3)
       .attr("d", lineClose);
 
     svg.append("text")
-      .attr("x", 20)
-      .attr("y", 30)
-      .style("font-size", "14px")
+      .attr("x", 30)
+      .attr("y", 40)
+      .style("font-size", "20px")
       .text("Price fluctuates but trends upward/downward.");
   }
 
@@ -51,14 +57,14 @@ function drawScene(scene, data) {
       .y(d => yClose(d.close));
 
     svg.append("path")
-      .datum(data)
+      .datum(sceneData)
       .attr("fill", "none")
       .attr("stroke", "steelblue")
-      .attr("stroke-width", 2)
+      .attr("stroke-width", 3)
       .attr("d", lineClose);
 
     const yVol = d3.scaleLinear()
-      .domain(d3.extent(data, d => d.SD20))
+      .domain(d3.extent(sceneData, d => d.SD20))
       .range([h - margin.bottom, margin.top]);
 
     const lineVol = d3.line()
@@ -66,16 +72,16 @@ function drawScene(scene, data) {
       .y(d => yVol(d.SD20));
 
     svg.append("path")
-      .datum(data)
+      .datum(sceneData)
       .attr("fill", "none")
       .attr("stroke", "orange")
-      .attr("stroke-width", 2)
+      .attr("stroke-width", 3)
       .attr("d", lineVol);
 
     svg.append("text")
-      .attr("x", 20)
-      .attr("y", 30)
-      .style("font-size", "14px")
+      .attr("x", 30)
+      .attr("y", 40)
+      .style("font-size", "20px")
       .text("Periods of high volatility correspond to sharp price movements.");
   }
 
@@ -86,15 +92,15 @@ function drawScene(scene, data) {
       .y(d => yClose(d.close));
 
     svg.append("path")
-      .datum(data)
+      .datum(sceneData)
       .attr("fill", "none")
       .attr("stroke", "steelblue")
-      .attr("stroke-width", 2)
+      .attr("stroke-width", 3)
       .attr("d", lineClose);
 
     svg.append("path")
-      .datum(data)
-      .attr("fill", "rgba(255,0,0,0.15)")
+      .datum(sceneData)
+      .attr("fill", "rgba(255,0,0,0.20)")
       .attr("stroke", "none")
       .attr("d", d3.area()
         .x(d => x(d.date))
@@ -111,25 +117,25 @@ function drawScene(scene, data) {
       .y(d => yClose(d.lower));
 
     svg.append("path")
-      .datum(data)
+      .datum(sceneData)
       .attr("fill", "none")
       .attr("stroke", "darkred")
-      .attr("stroke-width", 3)
+      .attr("stroke-width", 4)
       .attr("d", lineUpper);
 
     svg.append("path")
-      .datum(data)
+      .datum(sceneData)
       .attr("fill", "none")
       .attr("stroke", "maroon")
-      .attr("stroke-width", 3)
-      .attr("stroke-dasharray", "4 4")
+      .attr("stroke-width", 4)
+      .attr("stroke-dasharray", "6 6")
       .attr("d", lineLower);
 
     svg.append("text")
-      .attr("x", 20)
-      .attr("y", 30)
-      .style("font-size", "14px")
-      .text("Bands widen during periods of volatility and squeeze during calm periods.");
+      .attr("x", 30)
+      .attr("y", 40)
+      .style("font-size", "20px")
+      .text("Bands widen dramatically during volatile periods.");
   }
 
   svg.append("g")
