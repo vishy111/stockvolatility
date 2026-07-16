@@ -206,7 +206,7 @@ function drawScene(scene, data)
     svg.append("path")
       .datum(sceneData)
       .attr("fill", "none")
-      .attr("stroke", "purple")
+      .attr("stroke", "lightgreen")
       .attr("stroke-width", 3)
       .attr("d", lineMA20);
 
