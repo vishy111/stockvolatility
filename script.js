@@ -1,33 +1,45 @@
 let scene = 1;
 
-function setAnnotation(scene) {
-  const annotationEl = document.getElementById("annotation");
-  if (!annotationEl) return;
+function setAnnotation(scene ) 
+{
+  const box = document.getElementById("annotation");
+  if (!box) return;
 
   if (scene === 1) 
   {
-    annotationEl.textContent =
-      "Scene 1: The blue line shows AAPL’s closing price over time. "  +
+    box.textContent =
+      "Scene 1: The blue line shows AAPL’s closing price over time. " +
       "Even though it fluctuates day to day, you can still see broader upward or downward trends.";
-  } else if (scene === 2) 
-  {
-    annotationEl.textContent =
+  } else if (scene === 2) {
+    box.textContent =
       "Scene 2: The orange line (SD20) measures volatility. " +
-      "When SD20 rises, price movements become larger and more unstable. "  + 
+      "When SD20 rises, price movements become larger and more unstable. " +
       "When SD20 falls, the market is calmer and price changes are smaller.";
   } else if (scene === 3) 
   {
-    annotationEl.textContent =
-      "Scene 3: The red bands around the blue price line are Bollinger Bands based on MA20 and SD20. "   + 
-      "The lower band stays close to the price when volatility (SD20) is low, so the blue line can sometimes dip below it during sharp selloffs. "   +
+    box.textContent =
+      "Scene 3: The red bands around the blue price line are Bollinger Bands based on MA20 and SD20. " +
+      "The lower band stays close to the price when volatility (SD20) is low, so the blue line can sometimes dip below it during sharp selloffs. " +
       "The upper band can sit much higher than the price when volatility increases, causing the bands to widen and highlight periods of market stress.";
-  } else 
-  {
-    annotationEl.textContent = "";
+  } else {
+    box.textContent = "";
   }
 }
 
-function drawScene(scene, data) {
+function updateButtons( ) 
+{
+  const backBtn = document.getElementById("back");
+  const nextBtn = document.getElementById("next");
+
+  backBtn.classList.remove("disabled");
+  nextBtn.classList.remove("disabled");
+
+  if (scene === 1) backBtn.classList.add("disabled");
+  if (scene === 3) nextBtn.classList.add("disabled");
+}
+
+function drawScene(scene, data) 
+{
 
   d3.select("#chart").selectAll("*").remove();
 
@@ -37,20 +49,21 @@ function drawScene(scene, data) {
 
   let sceneData = data;
 
-  if (scene === 3) {
+  if (scene === 3) 
+  {
     sceneData = data.filter(d => d.date >= new Date("2020-03-15") && d.date <= new Date("2020-03-31"));
   }
 
-  
   const svg = d3.select("#chart")
     .append("svg")
     .attr("width", w)
     .attr("height", h);
 
-  const x = d3.scaleTime()
+  const x = d3.scaleTime( )
     .domain(d3.extent(sceneData, d => d.date))
     .range([margin.left, w - margin.right]);
 
+  
   const yClose = d3.scaleLinear()
     .domain([
       d3.min(sceneData, d => d.lower),
@@ -58,8 +71,8 @@ function drawScene(scene, data) {
     ])
     .range([h - margin.bottom, margin.top]);
 
-  if (scene === 1) {
-
+  if (scene === 1) 
+  {
     const lineClose = d3.line()
       .x(d => x(d.date))
       .y(d => yClose(d.close));
@@ -70,16 +83,9 @@ function drawScene(scene, data) {
       .attr("stroke", "steelblue")
       .attr("stroke-width", 3)
       .attr("d", lineClose);
-
-    svg.append("text")
-      .attr("x", 30)
-      .attr("y", 40)
-      .style("font-size", "20px")
-      .text("Price fluctuates but trends upward/downward.");
   }
 
   if (scene === 2) {
-
     const lineClose = d3.line()
       .x(d => x(d.date))
       .y(d => yClose(d.close));
@@ -91,6 +97,7 @@ function drawScene(scene, data) {
       .attr("stroke-width", 3)
       .attr("d", lineClose);
 
+    
     const yVol = d3.scaleLinear()
       .domain(d3.extent(sceneData, d => d.SD20))
       .range([h - margin.bottom, margin.top]);
@@ -105,16 +112,10 @@ function drawScene(scene, data) {
       .attr("stroke", "orange")
       .attr("stroke-width", 3)
       .attr("d", lineVol);
-
-    svg.append("text")
-      .attr("x", 30)
-      .attr("y", 40)
-      .style("font-size", "20px")
-      .text("Periods of high volatility correspond to sharp price movements.");
   }
 
-  if (scene === 3) {
-
+  if (scene === 3) 
+  {
     const lineClose = d3.line()
       .x(d => x(d.date))
       .y(d => yClose(d.close));
@@ -158,12 +159,6 @@ function drawScene(scene, data) {
       .attr("stroke-width", 4)
       .attr("stroke-dasharray", "6 6")
       .attr("d", lineLower);
-
-    svg.append("text")
-      .attr("x", 30)
-      .attr("y", 40)
-      .style("font-size", "20px")
-      .text("Bands widen dramatically during volatile periods.");
   }
 
   svg.append("g")
@@ -175,6 +170,7 @@ function drawScene(scene, data) {
     .call(d3.axisLeft(yClose));
 
   setAnnotation(scene);
+  updateButtons();
 }
 
 d3.csv("AAPL.csv").then(function(data) {
@@ -190,17 +186,26 @@ d3.csv("AAPL.csv").then(function(data) {
     d.lower = d.MA20 - (2 * d.SD20);
   });
 
+
+  
   window.globalData = data;
 
+  
   drawScene(scene, data);
 });
 
 document.getElementById("next").onclick = () => {
-  scene = Math.min(scene + 1, 3);
-  drawScene(scene, window.globalData);
+  if (scene < 3) 
+  {
+    scene++;
+    drawScene(scene, window.globalData);
+  }
 };
 
 document.getElementById("back").onclick = () => {
-  scene = Math.max(scene - 1, 1);
-  drawScene(scene, window.globalData);
+  if (scene > 1) 
+  {
+    scene--;
+    drawScene(scene, window.globalData);
+  }
 };
