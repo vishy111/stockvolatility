@@ -1,16 +1,8 @@
-console.log("JS loaded");
+let scene = 1;
 
-d3.csv("AAPL.csv").then(function(data) {
+function drawScene(scene, data) {
 
-  const parseDate = d3.timeParse("%Y-%m-%d");
-
-  data.forEach(function(d) {
-    d.date = parseDate(d.Date);
-    d.close = +d["Close(t)"];
-  });
-
-  console.log("COLUMN NAMES:", Object.keys(data[0]));
-  console.log("FIRST ROW:", data[0]);
+  d3.select("#chart").selectAll("*").remove();
 
   const w = 800;
   const h = 400;
@@ -25,20 +17,64 @@ d3.csv("AAPL.csv").then(function(data) {
     .domain(d3.extent(data, d => d.date))
     .range([margin.left, w - margin.right]);
 
-  const y = d3.scaleLinear()
+  const yClose = d3.scaleLinear()
     .domain(d3.extent(data, d => d.close))
     .range([h - margin.bottom, margin.top]);
 
-  const line = d3.line()
-    .x(d => x(d.date))
-    .y(d => y(d.close));
+  if (scene === 1) {
 
-  svg.append("path")
-    .datum(data)
-    .attr("fill", "none")
-    .attr("stroke", "steelblue")
-    .attr("stroke-width", 2)
-    .attr("d", line);
+    const lineClose = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.close));
+
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 2)
+      .attr("d", lineClose);
+
+    svg.append("text")
+      .attr("x", 20)
+      .attr("y", 30)
+      .style("font-size", "14px")
+      .text("Price fluctuates but trends upward/downward.");
+  }
+
+  if (scene === 2) {
+
+    const lineClose = d3.line()
+      .x(d => x(d.date))
+      .y(d => yClose(d.close));
+
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 2)
+      .attr("d", lineClose);
+
+    const yVol = d3.scaleLinear()
+      .domain(d3.extent(data, d => d.SD20))
+      .range([h - margin.bottom, margin.top]);
+
+    const lineVol = d3.line()
+      .x(d => x(d.date))
+      .y(d => yVol(d.SD20));
+
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "orange")
+      .attr("stroke-width", 2)
+      .attr("d", lineVol);
+
+    svg.append("text")
+      .attr("x", 20)
+      .attr("y", 30)
+      .style("font-size", "14px")
+      .text("Periods of high volatility correspond to sharp price movements.");
+  }
 
   svg.append("g")
     .attr("transform", `translate(0,${h - margin.bottom})`)
@@ -46,6 +82,30 @@ d3.csv("AAPL.csv").then(function(data) {
 
   svg.append("g")
     .attr("transform", `translate(${margin.left},0)`)
-    .call(d3.axisLeft(y));
+    .call(d3.axisLeft(yClose));
+}
 
+d3.csv("AAPL.csv").then(function(data) {
+
+  const parseDate = d3.timeParse("%Y-%m-%d");
+
+  data.forEach(function(d) {
+    d.date = parseDate(d.Date);
+    d.close = +d["Close(t)"];
+    d.SD20 = +d.SD20;
+  });
+
+  window.globalData = data;
+
+  drawScene(scene, data);
 });
+
+document.getElementById("next").onclick = () => {
+  scene = Math.min(scene + 1, 4);
+  drawScene(scene, window.globalData);
+};
+
+document.getElementById("back").onclick = () => {
+  scene = Math.max(scene - 1, 1);
+  drawScene(scene, window.globalData);
+};
