@@ -2,7 +2,6 @@ let scene = 1;
 
 function drawScene(scene, data) {
 
-  
   d3.select("#chart").selectAll("*").remove();
 
   const w = 1200;
@@ -132,32 +131,11 @@ function drawScene(scene, data) {
       .attr("stroke-dasharray", "6 6")
       .attr("d", lineLower);
 
-
-    
     svg.append("text")
       .attr("x", 30)
       .attr("y", 40)
       .style("font-size", "20px")
-      .style("font-weight", "bold")
-      .text("Understanding Market Volatility (AAPL)");
-
-    svg.append("text")
-      .attr("x", 30)
-      .attr("y", 70)
-      .style("font-size", "16px")
-      .text("• Lower band stays close to the price when volatility (SD20) is low.");
-
-    svg.append("text")
-      .attr("x", 30)
-      .attr("y", 95)
-      .style("font-size", "16px")
-      .text("• Price can dip below the lower band during sharp selloffs or breakdown events.");
-
-    svg.append("text")
-      .attr("x", 30)
-      .attr("y", 120)
-      .style("font-size", "16px")
-      .text("• Upper band rises sharply when volatility increases, creating wider bands.");
+      .text("Bands widen dramatically during volatile periods.");
   }
 
   svg.append("g")
@@ -171,17 +149,17 @@ function drawScene(scene, data) {
 
 d3.csv("AAPL.csv").then(function(data) {
 
-  const parseDate = d3.timeParse("%m/%d/%Y");
+  const parseDate = d3.timeParse("%Y-%m-%d");
 
   data.forEach(function(d) {
     d.date = parseDate(d.Date);
     d.close = +d["Close(t)"];
     d.SD20 = +d.SD20;
-    d.upper = +d.Upper_Band;
-    d.lower = +d.Lower_Band;
+    d.MA20 = +d.MA20;
+    d.upper = d.MA20 + (2 * d.SD20);
+    d.lower = d.MA20 - (2 * d.SD20);
   });
 
-  
   window.globalData = data;
 
   drawScene(scene, data);
