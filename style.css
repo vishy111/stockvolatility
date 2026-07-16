@@ -84,3 +84,41 @@ button
   stroke-width: 2px;
   fill: black;
 }
+
+.bb-btn 
+{
+  background: purple;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 4px 0 #5a007a;
+}
+
+.bb-btn:hover 
+{
+  background: #9b00c9;
+}
+
+.bb-btn:active 
+{
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #5a007a;
+}
+
+.bb-btn.disabled 
+{
+  background: #d1b3e0;
+  color: #f3e8ff;
+  cursor: default;
+  box-shadow: 0 4px 0 #bfa6d4;
+}
+
+.bb-btn.disabled:active 
+{
+  transform: none;
+  box-shadow: 0 4px 0 #bfa6d4;
+}
