@@ -22,10 +22,13 @@ function setAnnotation(scene )
   else if (scene === 3) 
   {
     box.textContent =
-      "The red Bollinger Bands widen sharply during the March 2020 crash. " +
-      "The upper band rises while the lower band falls, forming a large volatility envelope. " +
-      "This widening reflects extreme uncertainty, while later narrowing indicates stabilization.";
-  } 
+      "The purple middle band shows the 20‑day moving average (MA20), the baseline trend. " +
+      "If the middle band moves upward, it suggests an uptrend; downward movement suggests a downtrend. " +
+      "The dark red upper band marks two standard deviations above MA20. When price touches or moves outside this band, the asset may be overbought, signaling caution or a potential selling point. " +
+      "The dashed maroon lower band marks two standard deviations below MA20. When price touches or falls outside this band, the asset may be oversold, suggesting a possible buying opportunity. " +
+      "The width of the bands reflects volatility: narrow bands indicate calm periods and often precede a breakout ('the squeeze'), while wide bands indicate high volatility. " +
+      "Together, these three bands form the Bollinger Band envelope, used by traders to assess volatility, trend direction, and potential entry or exit points.";
+  }
   else 
   {
     box.textContent = "";
