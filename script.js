@@ -1,6 +1,7 @@
 d3.csv("AAPL.csv").then(function(data) {
   const parseDate = d3.timeParse("%m/%d/%Y");
 
+
   data.forEach(function(d) {
     d.date = parseDate(d.Date);
     d.close = +d["Close(t)"];
@@ -47,7 +48,9 @@ d3.csv("AAPL.csv").then(function(data) {
     .attr("transform", `translate(${margin.left},0)`)
     .call(d3.axisLeft(y));
   
-  console.log("JS running");
+  console.log("JS loaded");
+alert("JS loaded");
+
 
   
 });
