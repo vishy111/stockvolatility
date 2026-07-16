@@ -9,6 +9,8 @@ d3.csv("AAPL.csv").then(function(data) {
     d.close = +d["Close(t)"].trim();
   });
 
+  console.log("FIRST ROW  :", data[0]);
+
   const w = 800;
   const h = 400;
   const margin = { top: 40, right: 40, bottom: 40, left: 60 };
